@@ -11,19 +11,16 @@ Backend: Node.js, Express.js, SQLite (for storing tasks)
 Installation
 Clone the repository:
 
-bash
-Copiar código
+
 git clone https://github.com/your-username/todo-list.git
 cd todo-list
 Install dependencies:
 
-bash
-Copiar código
+
 npm install
 Start the server:
 
-bash
-Copiar código
+
 node server.js
 Open http://localhost:3000 in your web browser.
 
