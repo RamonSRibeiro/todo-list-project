@@ -8,20 +8,20 @@ Keyboard Shortcut: Pressing "Enter" adds a task directly.
 Technologies Used
 Frontend: HTML, CSS, JavaScript
 Backend: Node.js, Express.js, SQLite (for storing tasks)
+
 Installation
+
 Clone the repository:
-
-
 git clone https://github.com/your-username/todo-list.git
 cd todo-list
+
 Install dependencies:
-
-
 npm install
+
+
 Start the server:
-
-
 node server.js
+
 Open http://localhost:3000 in your web browser.
 
 Usage
