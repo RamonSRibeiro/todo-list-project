@@ -68,18 +68,3 @@ app.delete('/tasks/:id', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
-});
-// Rota para deletar uma tarefa
-app.delete('/tasks/:id', (req, res) => {
-    const { id } = req.params;
-    db.run('DELETE FROM tasks WHERE id = ?', [id], function (err) {
-      if (err) {
-        res.status(500).send(err.message);
-      } else {
-        res.json({ changes: this.changes });
-      }
-    });
-  });
-  
