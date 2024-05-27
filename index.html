@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Tarefas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      color: #333;
+    }
+
+    .task-input {
+      width: calc(100% - 80px);
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px 0 0 4px;
+    }
+
+    .add-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+    }
+
+    .add-button:hover {
+      background-color: #45a049;
+    }
+
+    .task-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .task-description {
+      flex: 1;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .remove-button {
+      padding: 8px 12px;
+      font-size: 14px;
+      background-color: #f44336;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .remove-button:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Lista de Tarefas</h1>
+      <div>
+        <input type="text" id="new-task" class="task-input" placeholder="Nova tarefa" onkeydown="handleKeyPress(event)">
+        <button onclick="addTask()" class="add-button">Adicionar</button>
+      </div>
+    </div>
+    
+    <ul id="tasks" class="task-list"></ul>
+  </div>
+
+  <script>
+    async function fetchTasks() {
+      const response = await fetch('/tasks');
+      const tasks = await response.json();
+      const tasksList = document.getElementById('tasks');
+      tasksList.innerHTML = '';
+      tasks.forEach(task => {
+        const taskItem = document.createElement('li');
+        taskItem.classList.add('task-item');
+
+        const taskDescription = document.createElement('span');
+        taskDescription.classList.add('task-description');
+        taskDescription.textContent = task.description;
+        taskItem.appendChild(taskDescription);
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remover';
+        removeButton.classList.add('remove-button');
+        removeButton.onclick = () => removeTask(task.id);
+        taskItem.appendChild(removeButton);
+
+        tasksList.appendChild(taskItem);
+      });
+    }
+
+    async function addTask() {
+      const newTaskInput = document.getElementById('new-task');
+      const description = newTaskInput.value;
+      await fetch('/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ description })
+      });
+      newTaskInput.value = '';
+      fetchTasks();
+    }
+
+    async function removeTask(taskId) {
+      await fetch(`/tasks/${taskId}`, {
+        method: 'DELETE'
+      });
+      fetchTasks();
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        addTask();
+      }
+    }
+
+    window.onload = fetchTasks;
+  </script>
+</body>
+</html>
