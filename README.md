@@ -12,7 +12,7 @@ Backend: Node.js, Express.js, SQLite (for storing tasks)
 Installation
 
 Clone the repository:
-git clone https://github.com/your-username/todo-list.git
+git clone https://github.com/XDi5a5ter/todo-list.git
 cd todo-list
 
 Install dependencies:
