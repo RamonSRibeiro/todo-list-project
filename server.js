@@ -1,70 +1,25 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
-const db = require('./database');
-
-const app = express();
-const port = 3000;
-
-app.use(bodyParser.json());
-
-// Servir arquivos estáticos do diretório raiz
-app.use(express.static(path.join(__dirname)));
-
-// Rota para servir a página index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Rota para obter todas as tarefas
-app.get('/tasks', (req, res) => {
-  db.all('SELECT * FROM tasks', (err, rows) => {
-    if (err) {
-      res.status(500).send(err.message);
-    } else {
-      res.json(rows);
-    }
-  });
-});
-
-// Rota para criar uma nova tarefa
-app.post('/tasks', (req, res) => {
-  const { description } = req.body;
-  db.run('INSERT INTO tasks (description) VALUES (?)', [description], function (err) {
-    if (err) {
-      res.status(500).send(err.message);
-    } else {
-      res.status(201).json({ id: this.lastID });
-    }
-  });
-});
-
-// Rota para atualizar uma tarefa
-app.put('/tasks/:id', (req, res) => {
-  const { id } = req.params;
-  const { description, completed } = req.body;
-  db.run(
-    'UPDATE tasks SET description = ?, completed = ? WHERE id = ?',
-    [description, completed, id],
-    function (err) {
-      if (err) {
-        res.status(500).send(err.message);
-      } else {
-        res.json({ changes: this.changes });
-      }
-    }
-  );
-});
-
 // Rota para deletar uma tarefa
-app.delete('/tasks/:id', (req, res) => {
+app.delete('/tasks/:id', async (req, res) => {
   const { id } = req.params;
-  db.run('DELETE FROM tasks WHERE id = ?', [id], function (err) {
-    if (err) {
-      res.status(500).send(err.message);
-    } else {
-      res.json({ changes: this.changes });
-    }
-  });
-});
 
+  try {
+    const result = await new Promise((resolve, reject) => {
+      db.run('DELETE FROM tasks WHERE id = ?', [id], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ changes: this.changes });
+        }
+      });
+    });
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Tarefa não encontrada' });
+    }
+
+    res.json({ success: true, message: 'Tarefa deletada com sucesso', changes: result.changes });
+  } catch (err) {
+    console.error('Erro ao deletar a tarefa:', err);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
